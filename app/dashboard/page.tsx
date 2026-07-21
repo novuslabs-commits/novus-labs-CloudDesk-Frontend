@@ -188,7 +188,7 @@ export default function QueuePage() {
   </div>
   <div>
     <label style={{ display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "6px" }}>Urgency</label>
-    <Select value={statusFilter} onValueChange={(v: string | null) => { if (v) { setStatusFilter(v); setPage(1); } }}>
+    <Select value={urgencyFilter} onValueChange={(v: string | null) => { if (v) { setUrgencyFilter(v); setPage(1); } }}>
       <SelectTrigger style={{ ...fieldStyle, width: "150px" }}><SelectValue /></SelectTrigger>
       <SelectContent>
         <SelectItem value="all">All Urgency</SelectItem>
@@ -200,7 +200,7 @@ export default function QueuePage() {
   </div>
   <div>
     <label style={{ display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "6px" }}>Intent</label>
-   <Select value={statusFilter} onValueChange={(v: string | null) => { if (v) { setStatusFilter(v); setPage(1); } }}>
+   <Select value={intentFilter} onValueChange={(v: string | null) => { if (v) { setIntentFilter(v); setPage(1); } }}>
       <SelectTrigger style={{ ...fieldStyle, width: "170px" }}><SelectValue /></SelectTrigger>
       <SelectContent>
         <SelectItem value="all">All Intents</SelectItem>
