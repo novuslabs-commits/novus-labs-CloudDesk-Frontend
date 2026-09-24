@@ -2,24 +2,25 @@ import { Mail, ExternalLink } from "lucide-react";
 
 export default function Footer() {
   return (
-    <div style={{
+    <div className="cd-footer" style={{
       marginTop: "48px",
       paddingTop: "20px",
       paddingBottom: "24px",
       borderTop: "1px solid #24242f",
       display: "flex",
+      flexWrap: "wrap",
       alignItems: "center",
       justifyContent: "center",
-      gap: "16px",
+      gap: "8px 16px",
     }}>
       <span style={{ fontSize: "11px", color: "#4b5563", letterSpacing: "0.02em" }}>
         Built by <span style={{ color: "#6b7280", fontWeight: 600 }}>Novus Labs</span>
       </span>
 
-      <span style={{ width: "3px", height: "3px", borderRadius: "999px", background: "#374151" }} />
+      <span className="cd-footer-dot" style={{ width: "3px", height: "3px", borderRadius: "999px", background: "#374151" }} />
 
       <a
-        href="mailto:novuslabs.team@gmail.com"
+        href="mailto:info@novuslabshq.com"
         style={{
           display: "flex",
           alignItems: "center",
@@ -33,10 +34,10 @@ export default function Footer() {
         onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "#4b5563"}
       >
         <Mail style={{ height: "11px", width: "11px" }} />
-        novuslabs.team@gmail.com
+        info@NovusLabsHQ.com
       </a>
 
-      <span style={{ width: "3px", height: "3px", borderRadius: "999px", background: "#374151" }} />
+      <span className="cd-footer-dot" style={{ width: "3px", height: "3px", borderRadius: "999px", background: "#374151" }} />
 
       <a
         href="https://www.linkedin.com/company/novus-labs-tech/"

@@ -1,10 +1,10 @@
 "use client";
 import { useAuth } from "@/lib/auth";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Inbox, BarChart3, Users, FileText, History, LogOut } from "lucide-react";
+import { Inbox, BarChart3, Users, FileText, History, LogOut, Menu, X } from "lucide-react";
 import Footer from "@/components/Footer";
 const navItems = [
   { href: "/dashboard", label: "Queue", icon: Inbox },
@@ -21,14 +21,39 @@ const TEAM_COLORS: Record<string, string> = {
   "Customer Success": "linear-gradient(135deg, #4ade80, #14b8a6)",
 };
 
+const iconButtonStyle: React.CSSProperties = {
+  alignItems: "center", justifyContent: "center", height: "40px", width: "40px", flexShrink: 0,
+  borderRadius: "10px", background: "transparent", border: "none", color: "#9ca3af", cursor: "pointer",
+};
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { agent, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const [navOpen, setNavOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!localStorage.getItem("token")) router.push("/login");
   }, [router]);
+
+  // Close the mobile drawer after navigating
+  const [navPath, setNavPath] = useState(pathname);
+  if (navPath !== pathname) {
+    setNavPath(pathname);
+    setNavOpen(false);
+  }
+
+  useEffect(() => {
+    if (!navOpen) return;
+    closeButtonRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setNavOpen(false); menuButtonRef.current?.focus(); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [navOpen]);
 
   if (!agent) return null;
 
@@ -36,20 +61,49 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const gradient = TEAM_COLORS[agent.team || ""] || "linear-gradient(135deg, #818cf8, #6366f1)";
 
   return (
-    <div style={{ display: "flex", height: "100vh", background: "#0a0a0f" }}>
+    <div className="cd-shell">
 
-      {/* Sidebar */}
-      <aside style={{ width: "240px", flexShrink: 0, display: "flex", flexDirection: "column", background: "#111118", borderRight: "1px solid #1e1e2e" }}>
+      {/* Top bar — below 1024px only */}
+      <header className="cd-topbar">
+        <button
+          ref={menuButtonRef}
+          onClick={() => setNavOpen(true)}
+          aria-label="Open navigation"
+          aria-expanded={navOpen}
+          aria-controls="dashboard-nav"
+          style={{ ...iconButtonStyle, display: "inline-flex" }}
+        >
+          <Menu style={{ height: "20px", width: "20px" }} />
+        </button>
+        <div style={{ width: 28, height: 28, position: "relative", borderRadius: 7, overflow: "hidden", flexShrink: 0 }}>
+          <Image src="/logo-icon.png" alt="" fill sizes="28px" style={{ objectFit: "contain" }} />
+        </div>
+        <p style={{ fontWeight: 700, fontSize: "14px", color: "#fff", letterSpacing: "-0.01em" }}>CloudDesk</p>
+      </header>
+
+      <div className="cd-scrim" data-open={navOpen} onClick={() => setNavOpen(false)} aria-hidden="true" />
+
+      {/* Sidebar — persistent from 1024px, off-canvas drawer below */}
+      <aside id="dashboard-nav" className="cd-sidebar" data-open={navOpen}>
 
         {/* Logo */}
         <div style={{ padding: "20px", display: "flex", alignItems: "center", gap: "12px", borderBottom: "1px solid #1e1e2e" }}>
           <div style={{ width: 32, height: 32, position: "relative", borderRadius: 8, overflow: "hidden", flexShrink: 0 }}>
             <Image src="/logo-icon.png" alt="CloudDesk" fill loading="eager" sizes="32px" style={{ objectFit: "contain" }} />
           </div>
-          <div>
+          <div style={{ minWidth: 0 }}>
             <p style={{ fontWeight: 700, fontSize: "14px", color: "#fff", letterSpacing: "-0.01em" }}>CloudDesk</p>
             <p style={{ fontSize: "11px", color: "#6b7280" }}>Support Intelligence</p>
           </div>
+          <button
+            ref={closeButtonRef}
+            className="cd-drawer-close"
+            onClick={() => { setNavOpen(false); menuButtonRef.current?.focus(); }}
+            aria-label="Close navigation"
+            style={{ ...iconButtonStyle, marginLeft: "auto", marginRight: "-8px" }}
+          >
+            <X style={{ height: "18px", width: "18px" }} />
+          </button>
         </div>
 
         {/* Nav */}
@@ -57,8 +111,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {navItems.map(({ href, label, icon: Icon }) => {
             const active = pathname === href;
             return (
-              <Link key={href} href={href} style={{ textDecoration: "none" }}>
-                <div style={{
+              <Link key={href} href={href} aria-current={active ? "page" : undefined} style={{ textDecoration: "none" }}>
+                <div className="cd-tap" style={{
                   display: "flex", alignItems: "center", gap: "12px",
                   padding: "10px 12px", borderRadius: "10px", fontSize: "13px",
                   cursor: "pointer", transition: "all 0.2s",
@@ -97,6 +151,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           <button
             onClick={logout}
+            className="cd-tap"
             style={{
               width: "100%", display: "flex", alignItems: "center", gap: "8px",
               padding: "8px 12px", borderRadius: "8px", fontSize: "12px",
@@ -118,12 +173,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Main content */}
-      <main style={{ flex: 1, overflow: "auto", background: "#131320", display: "flex", flexDirection: "column" }}>
-  <div style={{ flex: 1 }}>{children}</div>
-  <div style={{ padding: "0 32px" }}>
-    <Footer />
-  </div>
-</main>
+      <main className="cd-main">
+        <div style={{ flex: 1 }}>{children}</div>
+        <div className="cd-page-footer">
+          <Footer />
+        </div>
+      </main>
     </div>
   );
 }

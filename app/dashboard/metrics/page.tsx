@@ -56,7 +56,7 @@ function KPICard({ label, value, icon: Icon, color, suffix = "" }: { label: stri
         </div>
         <div style={{ minWidth: 0 }}>
           <p style={{ fontSize: "18px", fontWeight: 700, color: "#fff", lineHeight: 1.1 }}>{count}{suffix}</p>
-          <p style={{ fontSize: "10px", color: "#6b7280", marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{label}</p>
+          <p style={{ fontSize: "10px", color: "#6b7280", marginTop: "2px" }}>{label}</p>
         </div>
       </div>
     </div>
@@ -112,21 +112,21 @@ export default function MetricsPage() {
   const totalTickets = metrics?.total_tickets || 0;
 
   return (
-    <div style={{ padding: "32px" }}>
+    <div className="cd-page cd-cq">
 
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+      <div className="cd-page-header cd-head-gap">
         <div>
-          <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#fff" }}>Metrics</h1>
+          <h1 className="cd-title">Metrics</h1>
           <p style={{ fontSize: "13px", color: "#6b7280", marginTop: "4px" }}>Live performance overview</p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <div className="cd-actions cd-actions-fill">
           {lastUpdated && (
             <p style={{ fontSize: "12px", color: "#4b5563" }}>
               Updated {lastUpdated.toLocaleTimeString("en-PK", { timeZone: "Asia/Karachi" })}
             </p>
           )}
-          <button onClick={() => fetchMetrics(true)}
+          <button onClick={() => fetchMetrics(true)} className="cd-tap"
             style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 12px", borderRadius: "8px", fontSize: "12px", background: "#1a1a26", border: "1px solid #262635", color: "#6b7280", cursor: "pointer" }}>
             <RefreshCw className={refreshing ? "animate-spin" : ""} style={{ height: "14px", width: "14px" }} />
             Refresh
@@ -135,7 +135,7 @@ export default function MetricsPage() {
       </div>
 
       {/* KPI Cards — 4 per row, 2 rows */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "20px" }}>
+      <div className="cd-kpis" style={{ marginBottom: "20px" }}>
         {loading ? (
           [...Array(8)].map((_, i) => <SkeletonCard key={i} />)
         ) : (
@@ -153,17 +153,18 @@ export default function MetricsPage() {
       </div>
 
       {/* Pie chart + Line chart side by side */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+      <div className="cd-split" style={{ marginBottom: "16px" }}>
 
         {/* Intent pie chart */}
-        <div style={{ ...cardStyle, padding: "20px" }}>
+        <div className="cd-cq" style={{ ...cardStyle, padding: "20px" }}>
           <h3 style={{ fontSize: "13px", fontWeight: 600, color: "#fff", marginBottom: "4px" }}>Intent Distribution</h3>
           <p style={{ fontSize: "10px", color: "#6b7280", marginBottom: "12px" }}>Share of total classified tickets</p>
           {loading ? (
             <div className="skeleton" style={{ height: "200px", borderRadius: "12px" }} />
           ) : (
-            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-              <ResponsiveContainer width="50%" height={200}>
+            <div className="cd-pie-row">
+             <div className="cd-pie">
+              <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
                   <Pie
                     data={intentData}
@@ -182,7 +183,8 @@ export default function MetricsPage() {
                   <Tooltip contentStyle={{ background: "#111118", border: "1px solid #1e1e2e", borderRadius: 8, color: "#f1f5f9", fontSize: 12 }} />
                 </PieChart>
               </ResponsiveContainer>
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px", flex: 1 }}>
+             </div>
+              <div className="cd-pie-legend">
                 {intentData.map(entry => {
                   const pct = totalTickets > 0 ? Math.round((entry.value / totalTickets) * 100) : 0;
                   return (
@@ -222,7 +224,8 @@ export default function MetricsPage() {
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={d => new Date(d).toLocaleDateString("en-PK", { day: "numeric", month: "short" })}
-                  interval={5}
+                  interval="preserveStartEnd"
+                  minTickGap={20}
                 />
                 <YAxis tick={{ fontSize: 9, fill: "#6b7280" }} axisLine={false} tickLine={false} allowDecimals={false} width={24} />
                 <Tooltip
@@ -237,7 +240,7 @@ export default function MetricsPage() {
       </div>
 
       {/* Agent Workload + Urgency/Sentiment side by side */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+      <div className="cd-split">
 
         {/* Agent Workload */}
         <div style={{ ...cardStyle, padding: "20px" }}>
@@ -268,8 +271,8 @@ export default function MetricsPage() {
                       {initials}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "5px" }}>
-                        <div style={{ overflow: "hidden" }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", marginBottom: "5px" }}>
+                        <div style={{ minWidth: 0, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
                           <span style={{ fontSize: "12px", fontWeight: 500, color: "#fff" }}>{agent.name}</span>
                           <span style={{ fontSize: "11px", color: "#4b5563", marginLeft: "6px" }}>· {agent.team}</span>
                         </div>

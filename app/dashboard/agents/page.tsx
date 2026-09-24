@@ -59,16 +59,17 @@ function AgentCard({ agent, index }: { agent: Agent; index: number }) {
       </div>
 
       <div style={{ marginBottom: "16px" }}>
-        <p style={{ fontWeight: 600, color: "#fff", fontSize: "15px" }}>{agent.name}</p>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "4px 12px" }}>
+          <p style={{ fontWeight: 600, color: "#fff", fontSize: "15px", minWidth: 0 }}>{agent.name}</p>
+          <span style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
+            <Briefcase style={{ height: "14px", width: "14px", color: teamConfig.color }} />
+            <span style={{ fontSize: "12px", fontWeight: 500, color: teamConfig.color }}>{agent.team}</span>
+          </span>
+        </div>
         <p style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
-          <Mail style={{ height: "12px", width: "12px" }} />
-          {agent.email}
+          <Mail style={{ height: "12px", width: "12px", flexShrink: 0 }} />
+          <span style={{ minWidth: 0, overflowWrap: "anywhere" }}>{agent.email}</span>
         </p>
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "16px" }}>
-        <Briefcase style={{ height: "14px", width: "14px", color: teamConfig.color }} />
-        <span style={{ fontSize: "12px", fontWeight: 500, color: teamConfig.color }}>{agent.team}</span>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", borderRadius: "12px", background: "#111118", border: "1px solid #1e1e2e", marginBottom: "16px" }}>
@@ -85,6 +86,8 @@ function AgentCard({ agent, index }: { agent: Agent; index: number }) {
           {STATUS_OPTIONS.map(s => (
           <button
           key={s}
+          className="cd-tap"
+          aria-pressed={status === s}
           disabled={updating}
           onClick={async () => {
             setUpdating(true);
@@ -117,14 +120,14 @@ export default function AgentsPage() {
   }, []);
 
   return (
-    <div style={{ padding: "32px" }}>
-      <div style={{ marginBottom: "28px" }}>
-        <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#fff" }}>Agents</h1>
+    <div className="cd-page">
+      <div className="cd-head-gap">
+        <h1 className="cd-title">Agents</h1>
         <p style={{ fontSize: "13px", color: "#6b7280", marginTop: "4px" }}>{agents.length} team members</p>
       </div>
 
       {loading ? (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
+        <div className="cd-cards">
           {[...Array(6)].map((_, i) => (
             <div key={i} style={{ background: "#16161f", border: "1px solid #1e1e2e", borderRadius: "16px", padding: "20px" }}>
               <div className="skeleton" style={{ height: "48px", width: "48px", borderRadius: "16px", marginBottom: "16px" }} />
@@ -134,7 +137,7 @@ export default function AgentsPage() {
           ))}
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
+        <div className="cd-cards">
           {agents.map((agent, i) => <AgentCard key={agent.id} agent={agent} index={i} />)}
         </div>
       )}

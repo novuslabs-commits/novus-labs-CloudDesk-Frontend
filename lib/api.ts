@@ -11,11 +11,11 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// redirect to login on 401
+// redirect to login on 401 (not for the login request itself — the login page shows that error)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !error.config?.url?.includes("/auth/login")) {
       localStorage.removeItem("token");
       localStorage.removeItem("agent");
       window.location.href = "/login";

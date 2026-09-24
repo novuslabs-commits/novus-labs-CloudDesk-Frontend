@@ -33,8 +33,8 @@ function TemplateCard({ template }: { template: Template }) {
       onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = "#1e1e2e"}
     >
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px", marginBottom: "8px" }}>
-        <p style={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>{template.title}</p>
-        <button onClick={copy}
+        <p style={{ fontSize: "13px", fontWeight: 600, color: "#fff", minWidth: 0 }}>{template.title}</p>
+        <button onClick={copy} className="cd-tap"
           style={{ display: "flex", alignItems: "center", gap: "6px", padding: "4px 10px", borderRadius: "8px", fontSize: "11px", fontWeight: 500, cursor: "pointer", flexShrink: 0,
             background: copied ? "rgba(74,222,128,0.15)" : "rgba(99,102,241,0.12)",
             color: copied ? "#4ade80" : "#818cf8",
@@ -54,7 +54,7 @@ function IntentGroup({ intent, templates, defaultOpen }: { intent: string; templ
 
   return (
     <div style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid #1e1e2e" }}>
-      <button onClick={() => setOpen(o => !o)}
+      <button onClick={() => setOpen(o => !o)} aria-expanded={open}
         style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", background: "#16161f", border: "none", cursor: "pointer" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <span style={{ height: "10px", width: "10px", borderRadius: "999px", background: config.color }} />
@@ -66,7 +66,7 @@ function IntentGroup({ intent, templates, defaultOpen }: { intent: string; templ
         {open ? <ChevronUp style={{ height: "16px", width: "16px", color: "#4b5563" }} /> : <ChevronDown style={{ height: "16px", width: "16px", color: "#4b5563" }} />}
       </button>
       {open && (
-        <div style={{ padding: "16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", background: "#0f0f17", borderTop: "1px solid #1e1e2e" }}>
+        <div className="cd-pair" style={{ padding: "16px", background: "#0f0f17", borderTop: "1px solid #1e1e2e" }}>
           {templates.map(t => <TemplateCard key={t.id} template={t} />)}
         </div>
       )}
@@ -91,17 +91,17 @@ export default function TemplatesPage() {
   }, {} as Record<string, Template[]>);
 
   return (
-    <div style={{ padding: "32px" }}>
-      <div style={{ marginBottom: "24px" }}>
-        <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#fff" }}>Response Templates</h1>
+    <div className="cd-page cd-cq">
+      <div className="cd-head-gap">
+        <h1 className="cd-title">Response Templates</h1>
         <p style={{ fontSize: "13px", color: "#6b7280", marginTop: "4px" }}>
           {templates.length} templates across {Object.keys(INTENT_CONFIG).length} categories
         </p>
       </div>
 
       <div style={{ position: "relative", marginBottom: "20px" }}>
-        <Search style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", height: "16px", width: "16px", color: "#4b5563" }} />
-        <input placeholder="Search templates by title or content..." value={search} onChange={e => setSearch(e.target.value)}
+        <Search style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", height: "16px", width: "16px", color: "#4b5563", pointerEvents: "none" }} />
+        <input aria-label="Search templates" placeholder="Search templates by title or content..." value={search} onChange={e => setSearch(e.target.value)}
           style={{ width: "100%", paddingLeft: "42px", paddingRight: "16px", paddingTop: "12px", paddingBottom: "12px", borderRadius: "12px", fontSize: "13px", color: "#fff", background: "#16161f", border: "1px solid #1e1e2e", outline: "none", boxSizing: "border-box" }}
           onFocus={e => { e.currentTarget.style.border = "1px solid rgba(99,102,241,0.4)"; }}
           onBlur={e => { e.currentTarget.style.border = "1px solid #1e1e2e"; }}

@@ -132,12 +132,12 @@ export default function TicketDetailPage() {
   };
 
   if (loading) return (
-    <div style={{ padding: "32px", display: "flex", alignItems: "center", gap: "10px", color: "#6b7280", fontSize: "13px" }}>
+    <div className="cd-page" style={{ display: "flex", alignItems: "center", gap: "10px", color: "#6b7280", fontSize: "13px" }}>
       <div className="animate-spin" style={{ height: "16px", width: "16px", borderRadius: "999px", border: "2px solid #6366f1", borderTopColor: "transparent" }} />
       Loading ticket...
     </div>
   );
-  if (!ticket) return <div style={{ padding: "32px", color: "#6b7280" }}>Ticket not found.</div>;
+  if (!ticket) return <div className="cd-page" style={{ color: "#6b7280" }}>Ticket not found.</div>;
 
   const confidencePct = ((ticket.confidence || 0) * 100).toFixed(1);
   const confidenceColor = (ticket.confidence || 0) >= 0.85 ? "#4ade80" : (ticket.confidence || 0) >= 0.70 ? "#fbbf24" : "#ef4444";
@@ -153,19 +153,20 @@ export default function TicketDetailPage() {
   ];
 
   return (
-    <div style={{ padding: "32px" }}>
+    <div className="cd-page cd-cq">
 
       {/* Top bar */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
-        <button onClick={() => router.back()}
+      <div className="cd-page-header" style={{ marginBottom: "24px" }}>
+        <button onClick={() => router.back()} className="cd-tap"
           style={{ display: "flex", alignItems: "center", gap: "8px", background: "transparent", border: "none", color: "#9ca3af", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
           <ArrowLeft style={{ height: "16px", width: "16px" }} /> Back to Queue
         </button>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div className="cd-actions" style={{ gap: "10px" }}>
   {ticket.status === "open" && (
     <button
       onClick={() => router.push(`/dashboard/tickets/${ticket.id}/process`)}
+      className="cd-tap"
       style={{
         display: "flex", alignItems: "center", gap: "6px",
         padding: "8px 16px", borderRadius: "10px", fontSize: "13px", fontWeight: 600, color: "#fff",
@@ -175,20 +176,22 @@ export default function TicketDetailPage() {
       Respond to Ticket
     </button>
   )}
+  <label style={{ display: "flex", alignItems: "center", gap: "10px" }}>
   <span style={{ fontSize: "12px", color: "#6b7280" }}>Status</span>
-  <select value={ticket.status} disabled={updatingStatus} onChange={e => updateStatus(e.target.value)}
+  <select value={ticket.status} disabled={updatingStatus} onChange={e => updateStatus(e.target.value)} className="cd-tap"
     style={{ ...fieldStyle, borderRadius: "8px", padding: "6px 10px", fontSize: "12px", outline: "none" }}>
     <option value="open">Open</option>
     <option value="in_progress">In Progress</option>
     <option value="resolved">Resolved</option>
     <option value="closed">Closed</option>
   </select>
+  </label>
 </div>
       </div>
 
       {/* Title block */}
       <div style={{ marginBottom: "24px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+        <div className="cd-wrap" style={{ gap: "8px 10px", marginBottom: "8px" }}>
           <span style={{ fontSize: "12px", color: "#4b5563", fontFamily: "monospace" }}>#{ticket.id}</span>
           {ticket.needs_review && (
             <span style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "11px", color: "#fbbf24", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", padding: "3px 10px", borderRadius: "999px" }}>
@@ -198,18 +201,18 @@ export default function TicketDetailPage() {
           <Badge bg={statusC.bg} text={statusC.text}>{ticket.status.replace("_", " ")}</Badge>
         </div>
         <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#fff", marginBottom: "8px" }}>{ticket.subject}</h1>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "12px", color: "#6b7280" }}>
+        <div className="cd-wrap" style={{ gap: "6px 12px", fontSize: "12px", color: "#6b7280" }}>
           <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <Clock style={{ height: "12px", width: "12px" }} />
             {new Date(ticket.created_at ).toLocaleString("en-PK", { timeZone: "Asia/Karachi" })}
           </span>
-          <span>·</span>
+          <span className="cd-sep">·</span>
           <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <Tag style={{ height: "12px", width: "12px" }} /> via {ticket.source}
           </span>
           {ticket.resolved_at && (
             <>
-              <span>·</span>
+              <span className="cd-sep">·</span>
               <span style={{ display: "flex", alignItems: "center", gap: "6px", color: "#4ade80" }}>
                 <CheckCircle style={{ height: "12px", width: "12px" }} />
                 Resolved {new Date(ticket.resolved_at ).toLocaleString("en-PK", { timeZone: "Asia/Karachi" })}
@@ -219,10 +222,10 @@ export default function TicketDetailPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "24px" }}>
+      <div className="cd-detail">
 
         {/* LEFT */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <div className="cd-detail-main">
 
           {/* Customer message */}
           <div style={{ ...cardStyle, padding: "20px" }}>
@@ -235,9 +238,10 @@ export default function TicketDetailPage() {
 
           {/* Tabs */}
           <div>
-            <div style={{ display: "flex", gap: "6px", padding: "4px", borderRadius: "12px", background: "#16161f", border: "1px solid #1e1e2e", marginBottom: "16px", width: "fit-content" }}>
+            <div className="cd-tabs" role="tablist" style={{ gap: "6px", padding: "4px", borderRadius: "12px", background: "#16161f", border: "1px solid #1e1e2e", marginBottom: "16px" }}>
               {tabs.map(t => (
                 <button key={t.key} onClick={() => setActiveTab(t.key as any)}
+                  role="tab" aria-selected={activeTab === t.key} className="cd-tap"
                   style={{
                     padding: "7px 14px", borderRadius: "8px", fontSize: "12px", fontWeight: 500, cursor: "pointer",
                     background: activeTab === t.key ? "rgba(99,102,241,0.15)" : "transparent",
@@ -253,7 +257,7 @@ export default function TicketDetailPage() {
             {activeTab === "classification" && (
               <div style={{ ...cardStyle, padding: "24px" }}>
                 <div style={{ marginBottom: "20px" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+                  <div className="cd-wrap" style={{ justifyContent: "space-between", gap: "8px", marginBottom: "10px" }}>
                     <p style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.05em" }}>Predicted Intent</p>
                     <Badge bg={intentC.bg} text={intentC.text}>{ticket.intent?.replace("_", " ")}</Badge>
                   </div>
@@ -269,7 +273,7 @@ export default function TicketDetailPage() {
                       : "Low confidence — manual review recommended"}
                   </p>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", paddingTop: "16px", borderTop: "1px solid #1e1e2e" }}>
+                <div className="cd-facts" style={{ paddingTop: "16px", borderTop: "1px solid #1e1e2e" }}>
                   <div>
                     <p style={{ fontSize: "11px", color: "#6b7280", marginBottom: "6px" }}>Urgency</p>
                     <Badge bg={urgencyC.bg} text={urgencyC.text}>{ticket.urgency}</Badge>
@@ -301,15 +305,16 @@ export default function TicketDetailPage() {
                       <div style={{ padding: "14px", background: "#111118", border: "1px solid #1e1e2e", borderRadius: "10px", fontSize: "13px", lineHeight: 1.7, color: "#d1d5db", whiteSpace: "pre-wrap" }}>
                         {generatedResponse}
                       </div>
-                      <div style={{ display: "flex", gap: "8px" }}>
+                      <div className="cd-wrap" style={{ gap: "8px" }}>
                         <button onClick={() => { navigator.clipboard.writeText(generatedResponse); setCopiedId(-1); setTimeout(() => setCopiedId(null), 2000); }}
+                          className="cd-tap"
                           style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "8px", fontSize: "12px", fontWeight: 500, cursor: "pointer",
                             background: copiedId === -1 ? "rgba(74,222,128,0.15)" : "transparent",
                             color: copiedId === -1 ? "#4ade80" : "#9ca3af",
                             border: "1px solid #2a2a3e" }}>
                           {copiedId === -1 ? <><CheckCircle style={{ height: "12px", width: "12px" }} /> Copied</> : <><Copy style={{ height: "12px", width: "12px" }} /> Copy Response</>}
                         </button>
-                        <button onClick={() => setGeneratedResponse("")}
+                        <button onClick={() => setGeneratedResponse("")} className="cd-tap"
                           style={{ padding: "7px 14px", borderRadius: "8px", fontSize: "12px", fontWeight: 500, cursor: "pointer", background: "transparent", color: "#6b7280", border: "none" }}>
                           Regenerate
                         </button>
@@ -358,14 +363,14 @@ export default function TicketDetailPage() {
                     </p>
                     {suggestions.map((s, i) => (
                       <div key={s.template_id} style={{ ...cardStyle, padding: "16px" }}>
-                        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px", marginBottom: "8px" }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", gap: "8px 12px", marginBottom: "8px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0 }}>
                             <span style={{ fontSize: "11px", fontWeight: 700, color: "#4b5563" }}>#{i + 1}</span>
                             <span style={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>{s.title}</span>
                           </div>
                           <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
                             <span style={{ fontSize: "11px", color: "#4b5563" }}>{(s.similarity * 100).toFixed(0)}% match</span>
-                            <button onClick={() => copyTemplate(s.body, s.template_id)}
+                            <button onClick={() => copyTemplate(s.body, s.template_id)} className="cd-tap"
                               style={{ display: "flex", alignItems: "center", gap: "6px", padding: "5px 12px", borderRadius: "8px", fontSize: "11px", fontWeight: 500, cursor: "pointer",
                                 background: copiedId === s.template_id ? "rgba(74,222,128,0.15)" : "rgba(99,102,241,0.1)",
                                 color: copiedId === s.template_id ? "#4ade80" : "#818cf8",
@@ -421,7 +426,7 @@ export default function TicketDetailPage() {
         </div>
 
         {/* RIGHT — sidebar */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <div className="cd-detail-aside">
 
           {/* Ticket details */}
           <div style={{ ...cardStyle, padding: "20px" }}>
@@ -435,9 +440,9 @@ export default function TicketDetailPage() {
                 { label: "Team", value: ticket.assigned_team || "—" },
                 { label: "Confidence", value: `${confidencePct}%` },
               ].map(({ label, value }) => (
-                <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
                   <span style={{ fontSize: "12px", color: "#6b7280" }}>{label}</span>
-                  <span style={{ fontSize: "12px", fontWeight: 500, color: "#fff" }}>{value}</span>
+                  <span style={{ fontSize: "12px", fontWeight: 500, color: "#fff", minWidth: 0, textAlign: "right" }}>{value}</span>
                 </div>
               ))}
             </div>
@@ -452,7 +457,7 @@ export default function TicketDetailPage() {
             {assignedAgent && (
               <div style={{ padding: "12px", background: "#111118", borderRadius: "10px", marginBottom: "14px" }}>
                 <p style={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>{assignedAgent.name}</p>
-                <p style={{ fontSize: "11px", color: "#6b7280", marginTop: "2px" }}>{assignedAgent.email}</p>
+                <p style={{ fontSize: "11px", color: "#6b7280", marginTop: "2px", overflowWrap: "anywhere" }}>{assignedAgent.email}</p>
                 <p style={{ fontSize: "11px", color: "#6b7280", marginTop: "2px" }}>{assignedAgent.team}</p>
               </div>
             )}
@@ -503,10 +508,6 @@ export default function TicketDetailPage() {
   </div>
 )}
 
-       {/* Timeline */}
-       <div style={{ ...cardStyle, padding: "20px" }}>
-  
-        </div>
           {/* Timeline */}
           <div style={{ ...cardStyle, padding: "20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>

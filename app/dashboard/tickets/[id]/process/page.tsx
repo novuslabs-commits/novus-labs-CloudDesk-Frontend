@@ -90,20 +90,21 @@ export default function ProcessTicketPage() {
   };
 
   if (loading) return (
-    <div style={{ padding: "32px", color: "#6b7280", fontSize: "13px" }}>Loading ticket...</div>
+    <div className="cd-page" style={{ color: "#6b7280", fontSize: "13px" }}>Loading ticket...</div>
   );
-  if (!ticket) return <div style={{ padding: "32px", color: "#6b7280" }}>Ticket not found.</div>;
+  if (!ticket) return <div className="cd-page" style={{ color: "#6b7280" }}>Ticket not found.</div>;
 
   return (
-    <div style={{ padding: "32px", maxWidth: "760px" }}>
+    <div className="cd-page">
+     <div className="cd-cq" style={{ maxWidth: "760px" }}>
 
-      <button onClick={() => router.back()}
+      <button onClick={() => router.back()} className="cd-tap"
         style={{ display: "flex", alignItems: "center", gap: "8px", background: "transparent", border: "none", color: "#9ca3af", fontSize: "13px", fontWeight: 500, cursor: "pointer", marginBottom: "20px" }}>
         <ArrowLeft style={{ height: "16px", width: "16px" }} /> Back
       </button>
 
       {/* Progress steps */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px" }}>
+      <div className="cd-steps" style={{ marginBottom: "24px" }}>
         {[
           { key: "respond", label: "Send Response" },
           { key: "resolve", label: "Resolve" },
@@ -112,9 +113,9 @@ export default function ProcessTicketPage() {
           const isActive = step === s.key;
           const isDone = (s.key === "respond" && step !== "respond") || (s.key === "resolve" && step === "done");
           return (
-            <div key={s.key} style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
-              <div style={{
-                display: "flex", alignItems: "center", gap: "8px", padding: "6px 14px", borderRadius: "999px", fontSize: "12px", fontWeight: 600,
+            <div key={s.key} className="cd-step">
+              <div className="cd-step-pill" aria-current={isActive ? "step" : undefined} style={{
+                display: "flex", alignItems: "center", gap: "8px", borderRadius: "999px", fontSize: "12px", fontWeight: 600,
                 background: isDone ? "rgba(74,222,128,0.12)" : isActive ? "rgba(99,102,241,0.15)" : "#16161f",
                 color: isDone ? "#4ade80" : isActive ? "#818cf8" : "#4b5563",
                 border: isDone ? "1px solid rgba(74,222,128,0.25)" : isActive ? "1px solid rgba(99,102,241,0.25)" : "1px solid #1e1e2e",
@@ -122,7 +123,7 @@ export default function ProcessTicketPage() {
                 {isDone && <CheckCircle style={{ height: "12px", width: "12px" }} />}
                 {s.label}
               </div>
-              {i < 2 && <div style={{ flex: 1, height: "1px", background: "#1e1e2e" }} />}
+              {i < 2 && <div className="cd-step-line" />}
             </div>
           );
         })}
@@ -233,6 +234,7 @@ export default function ProcessTicketPage() {
           </button>
         </div>
       )}
+     </div>
     </div>
   );
 }

@@ -30,6 +30,18 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   closed:      { bg: "rgba(107,114,128,0.12)", text: "#9ca3af" },
 };
 
+// Filter options: value → label shown in the select
+const STATUS_FILTERS: Record<string, string> = {
+  all: "All Status", open: "Open", in_progress: "In Progress", resolved: "Resolved", closed: "Closed",
+};
+const URGENCY_FILTERS: Record<string, string> = {
+  all: "All Urgency", high: "High", medium: "Medium", low: "Low",
+};
+const INTENT_FILTERS: Record<string, string> = {
+  all: "All Intents", billing: "Billing", technical: "Technical", feature_request: "Feature Request",
+  complaint: "Complaint", refund: "Refund", account_access: "Account Access", general: "General",
+};
+
 const URGENCY_LEFT_BORDER: Record<string, string> = {
   high: "#ef4444", medium: "#f59e0b", low: "#22c55e",
 };
@@ -90,6 +102,13 @@ export default function QueuePage() {
 
   useEffect(() => { fetchTickets(); }, [page, statusFilter, urgencyFilter, intentFilter]);
 
+  useEffect(() => {
+    if (!dialogOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setDialogOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [dialogOpen]);
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setCreating(true);
@@ -117,24 +136,25 @@ export default function QueuePage() {
 };
 
   return (
-    <div style={{ padding: "32px" }}>
+    <div className="cd-page">
+     <div className="cd-cq">
 
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
+      <div className="cd-page-header cd-head-gap">
         <div>
-          <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#fff" }}>Ticket Queue</h1>
+          <h1 className="cd-title">Ticket Queue</h1>
           <p style={{ fontSize: "13px", color: "#6b7280", marginTop: "4px" }}>{total} tickets total</p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <div className="cd-actions cd-actions-fill">
           <div style={{ display: "flex", alignItems: "center", borderRadius: "10px", padding: "4px", gap: "4px", background: "#16161f", border: "1px solid #1e1e2e" }}>
-            <button onClick={() => setView("list")} style={{
+            <button onClick={() => setView("list")} className="cd-tap-icon" aria-label="List view" aria-pressed={view === "list"} style={{
               padding: "6px", borderRadius: "8px", border: "none", cursor: "pointer",
               background: view === "list" ? "rgba(99,102,241,0.2)" : "transparent",
               color: view === "list" ? "#818cf8" : "#4b5563",
             }}>
               <LayoutList style={{ height: "16px", width: "16px" }} />
             </button>
-            <button onClick={() => setView("kanban")} style={{
+            <button onClick={() => setView("kanban")} className="cd-tap-icon" aria-label="Board view" aria-pressed={view === "kanban"} style={{
               padding: "6px", borderRadius: "8px", border: "none", cursor: "pointer",
               background: view === "kanban" ? "rgba(99,102,241,0.2)" : "transparent",
               color: view === "kanban" ? "#818cf8" : "#4b5563",
@@ -144,6 +164,7 @@ export default function QueuePage() {
           </div>
           <button
             onClick={() => setDialogOpen(true)}
+            className="cd-tap cd-grow"
             style={{
               display: "flex", alignItems: "center", gap: "8px",
               padding: "9px 16px", borderRadius: "10px",
@@ -158,8 +179,8 @@ export default function QueuePage() {
       </div>
 
       {/* Filters */}
-<div style={{ display: "flex", gap: "12px", marginBottom: "20px", flexWrap: "wrap", alignItems: "flex-end" }}>
-  <div style={{ position: "relative", flex: 1, minWidth: "220px" }}>
+<div className="cd-filters">
+  <div style={{ position: "relative", minWidth: 0 }}>
     <label style={{ display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "6px" }}>Search</label>
     <Search style={{
       position: "absolute", left: "12px", top: "calc(50% + 10px)",
@@ -170,50 +191,26 @@ export default function QueuePage() {
       placeholder="Search tickets..."
       value={search}
       onChange={e => setSearch(e.target.value)}
-      style={{ ...fieldStyle, paddingLeft: "36px" }}
+      style={{ ...fieldStyle, paddingLeft: "36px", paddingRight: "12px" }}
     />
   </div>
-  <div>
-    <label style={{ display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "6px" }}>Status</label>
-    <Select value={statusFilter} onValueChange={(v: string | null) => { if (v) { setStatusFilter(v); setPage(1); } }}>
-      <SelectTrigger style={{ ...fieldStyle, width: "150px" }}><SelectValue /></SelectTrigger>
-      <SelectContent>
-        <SelectItem value="all">All Status</SelectItem>
-        <SelectItem value="open">Open</SelectItem>
-        <SelectItem value="in_progress">In Progress</SelectItem>
-        <SelectItem value="resolved">Resolved</SelectItem>
-        <SelectItem value="closed">Closed</SelectItem>
-      </SelectContent>
-    </Select>
-  </div>
-  <div>
-    <label style={{ display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "6px" }}>Urgency</label>
-    <Select value={urgencyFilter} onValueChange={(v: string | null) => { if (v) { setUrgencyFilter(v); setPage(1); } }}>
-      <SelectTrigger style={{ ...fieldStyle, width: "150px" }}><SelectValue /></SelectTrigger>
-      <SelectContent>
-        <SelectItem value="all">All Urgency</SelectItem>
-        <SelectItem value="high">High</SelectItem>
-        <SelectItem value="medium">Medium</SelectItem>
-        <SelectItem value="low">Low</SelectItem>
-      </SelectContent>
-    </Select>
-  </div>
-  <div>
-    <label style={{ display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "6px" }}>Intent</label>
-   <Select value={intentFilter} onValueChange={(v: string | null) => { if (v) { setIntentFilter(v); setPage(1); } }}>
-      <SelectTrigger style={{ ...fieldStyle, width: "170px" }}><SelectValue /></SelectTrigger>
-      <SelectContent>
-        <SelectItem value="all">All Intents</SelectItem>
-        <SelectItem value="billing">Billing</SelectItem>
-        <SelectItem value="technical">Technical</SelectItem>
-        <SelectItem value="feature_request">Feature Request</SelectItem>
-        <SelectItem value="complaint">Complaint</SelectItem>
-        <SelectItem value="refund">Refund</SelectItem>
-        <SelectItem value="account_access">Account Access</SelectItem>
-        <SelectItem value="general">General</SelectItem>
-      </SelectContent>
-    </Select>
-  </div>
+  {([
+    { label: "Status", value: statusFilter, set: setStatusFilter, items: STATUS_FILTERS },
+    { label: "Urgency", value: urgencyFilter, set: setUrgencyFilter, items: URGENCY_FILTERS },
+    { label: "Intent", value: intentFilter, set: setIntentFilter, items: INTENT_FILTERS },
+  ]).map(f => (
+    <div key={f.label}>
+      <label style={{ display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "6px" }}>{f.label}</label>
+      <Select items={f.items} value={f.value} onValueChange={(v: string | null) => { if (v) { f.set(v); setPage(1); } }}>
+        <SelectTrigger aria-label={f.label} style={{ ...fieldStyle, width: "100%", paddingLeft: "12px", paddingRight: "10px" }}><SelectValue /></SelectTrigger>
+        <SelectContent>
+          {Object.entries(f.items).map(([value, label]) => (
+            <SelectItem key={value} value={value}>{label}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  ))}
 </div>
 
       {/* Ticket List */}
@@ -256,8 +253,8 @@ export default function QueuePage() {
                   (e.currentTarget as HTMLElement).style.borderColor = "#1e1e2e";
                 }}
               >
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="cd-row">
+                  <div className="cd-row-main">
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
                       {ticket.needs_review && (
                         <AlertTriangle style={{ height: "14px", width: "14px", color: "#fbbf24", flexShrink: 0 }} />
@@ -274,11 +271,11 @@ export default function QueuePage() {
                       {ticket.body}
                     </p>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+                  <div className="cd-row-meta">
                     {ticket.urgency && <Badge bg={urgencyC.bg} text={urgencyC.text}>{ticket.urgency}</Badge>}
                     {ticket.intent && <Badge bg={intentC.bg} text={intentC.text}>{ticket.intent.replace("_", " ")}</Badge>}
                     <Badge bg={statusC.bg} text={statusC.text}>{ticket.status.replace("_", " ")}</Badge>
-                    <span style={{ fontSize: "12px", color: "#4b5563", minWidth: "80px", textAlign: "right" }}>
+                    <span className="cd-row-date" style={{ fontSize: "12px", color: "#4b5563" }}>
                       {new Date(ticket.created_at ).toLocaleDateString("en-PK", { timeZone: "Asia/Karachi" })}
                     </span>
                   </div>
@@ -288,7 +285,7 @@ export default function QueuePage() {
           })}
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px" }}>
+        <div className="cd-kanban">
           {KANBAN_COLUMNS.map(col => {
             const colTickets = filtered.filter(t => t.status === col.key);
             return (
@@ -339,10 +336,11 @@ export default function QueuePage() {
 
       {/* Pagination */}
       {totalPages > 1 && view === "list" && (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "24px" }}>
+        <div className="cd-pagination">
           <p style={{ fontSize: "13px", color: "#4b5563" }}>Page {page} of {totalPages}</p>
           <div style={{ display: "flex", gap: "8px" }}>
             <button
+              className="cd-tap"
               disabled={page === 1}
               onClick={() => setPage(p => p - 1)}
               style={{
@@ -355,6 +353,7 @@ export default function QueuePage() {
               Previous
             </button>
             <button
+              className="cd-tap"
               disabled={page === totalPages}
               onClick={() => setPage(p => p + 1)}
               style={{
@@ -369,6 +368,7 @@ export default function QueuePage() {
           </div>
         </div>
       )}
+     </div>
 
       {/* Create ticket modal */}
       {dialogOpen && (
@@ -378,18 +378,21 @@ export default function QueuePage() {
             position: "fixed", inset: 0, zIndex: 50,
             background: "rgba(0,0,0,0.6)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            padding: "20px",
+            padding: "16px",
           }}
         >
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="create-ticket-title"
             onClick={e => e.stopPropagation()}
             style={{
-              width: "100%", maxWidth: "480px",
+              width: "100%", maxWidth: "480px", maxHeight: "100%", overflowY: "auto",
               background: "#111118", border: "1px solid #1e1e2e", borderRadius: "16px",
-              padding: "24px",
+              padding: "clamp(18px, 5vw, 24px)",
             }}
           >
-            <h2 style={{ fontSize: "16px", fontWeight: 700, color: "#fff", marginBottom: "20px" }}>
+            <h2 id="create-ticket-title" style={{ fontSize: "16px", fontWeight: 700, color: "#fff", marginBottom: "20px" }}>
               Create Ticket
             </h2>
             <form onSubmit={handleCreate} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -422,9 +425,10 @@ export default function QueuePage() {
                   }}
                 />
               </div>
-              <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end", marginTop: "4px" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "flex-end", marginTop: "4px" }}>
                 <button
                   type="button"
+                  className="cd-tap"
                   onClick={() => setDialogOpen(false)}
                   style={{
                     padding: "9px 16px", borderRadius: "10px", fontSize: "13px",
@@ -436,6 +440,7 @@ export default function QueuePage() {
                 </button>
                 <button
                   type="submit"
+                  className="cd-tap"
                   disabled={creating}
                   style={{
                     padding: "9px 16px", borderRadius: "10px", fontSize: "13px", fontWeight: 600,

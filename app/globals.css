@@ -40,6 +40,7 @@ body {
   color: var(--foreground);
   font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
 }
 
 /* ── Scrollbar ── */
@@ -190,3 +191,225 @@ input:-webkit-autofill:focus {
 [data-slot="badge"] {
   border-color: transparent;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   Responsive layout
+   Pages style themselves inline; the layout properties that must
+   change with available width live here instead.
+   - Viewport media queries: app shell and login (full-screen layouts).
+   - Container queries: everything inside a page, so layouts respond to
+     the space left after the sidebar rather than the device width.
+     Never put .cd-cq on an ancestor of a position:fixed element.
+   ══════════════════════════════════════════════════════════════ */
+
+.cd-cq { container-type: inline-size; min-width: 0; }
+
+/* ── App shell ── */
+.cd-shell { display: flex; height: 100vh; height: 100dvh; background: #0a0a0f; }
+.cd-sidebar {
+  width: 240px; flex-shrink: 0; display: flex; flex-direction: column;
+  background: #111118; border-right: 1px solid #1e1e2e;
+}
+.cd-main {
+  flex: 1; min-width: 0; min-height: 0; overflow: auto;
+  background: #131320; display: flex; flex-direction: column;
+}
+.cd-topbar, .cd-scrim, .cd-drawer-close { display: none; }
+
+@media (max-width: 1023.98px) {
+  .cd-shell { flex-direction: column; }
+  .cd-topbar {
+    display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    padding: 8px 16px 8px 8px; background: #111118; border-bottom: 1px solid #1e1e2e;
+  }
+  .cd-sidebar {
+    position: fixed; top: 0; bottom: 0; left: 0; z-index: 60;
+    width: min(280px, 85vw); overflow-y: auto; overscroll-behavior: contain;
+    transform: translateX(-100%); visibility: hidden;
+    transition: transform 0.25s ease, visibility 0s linear 0.25s;
+  }
+  .cd-sidebar[data-open="true"] {
+    transform: none; visibility: visible; transition: transform 0.25s ease;
+    box-shadow: 12px 0 40px rgba(0, 0, 0, 0.5);
+  }
+  .cd-scrim {
+    display: block; position: fixed; inset: 0; z-index: 55;
+    background: rgba(0, 0, 0, 0.6); opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+  }
+  .cd-scrim[data-open="true"] { opacity: 1; pointer-events: auto; }
+  .cd-drawer-close { display: inline-flex; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cd-sidebar, .cd-sidebar[data-open="true"], .cd-scrim { transition: none; }
+}
+
+/* ── Page frame ── */
+.cd-page {
+  width: 100%; max-width: 1600px; margin-inline: auto;
+  padding: clamp(16px, 4vw, 32px);
+}
+.cd-page-footer {
+  width: 100%; max-width: 1600px; margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 32px);
+}
+.cd-page-header {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 12px 16px;
+}
+.cd-page-header > * { min-width: 0; }
+.cd-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.cd-title { font-size: clamp(21px, 16px + 1.6vw, 24px); font-weight: 700; color: #fff; line-height: 1.2; }
+.cd-head-gap { margin-bottom: clamp(16px, 3vw, 24px); }
+/* Page actions take their own full-width row on phones */
+@container (max-width: 479.98px) {
+  .cd-actions-fill { width: 100%; justify-content: space-between; }
+  .cd-actions-fill > .cd-grow { flex: 1; justify-content: center; }
+  .cd-segment { flex-wrap: nowrap; }
+  .cd-segment > * { flex: 1 1 0; white-space: nowrap; padding-inline: 8px !important; }
+}
+.cd-wrap { display: flex; flex-wrap: wrap; align-items: center; }
+@container (max-width: 559.98px) { .cd-sep { display: none; } }
+.cd-pagination {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 12px; margin-top: 24px;
+}
+
+/* ── Ticket rows (queue + history): stack badges under text when narrow ── */
+.cd-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.cd-row-main { flex: 1; min-width: 0; }
+.cd-row-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.cd-row-date { min-width: 80px; text-align: right; }
+@container (max-width: 639.98px) {
+  .cd-row { flex-direction: column; align-items: stretch; gap: 10px; }
+  .cd-row-main { flex: none; }
+  .cd-row-meta { flex-wrap: wrap; gap: 6px 8px; }
+  .cd-row-date { min-width: 0; margin-left: auto; }
+}
+
+/* ── Queue filters: 2-col → 3-col → single row ── */
+.cd-filters {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px; align-items: end; margin-bottom: 20px;
+}
+.cd-filters > :first-child, .cd-filters > :last-child { grid-column: 1 / -1; }
+@container (min-width: 480px) {
+  .cd-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cd-filters > :last-child { grid-column: auto; }
+}
+@container (min-width: 720px) {
+  .cd-filters { grid-template-columns: minmax(0, 1fr) 150px 150px 170px; }
+  .cd-filters > :first-child { grid-column: auto; }
+}
+
+/* ── Grids ── */
+.cd-kanban { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+@container (min-width: 520px) { .cd-kanban { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (min-width: 960px) { .cd-kanban { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+.cd-cards { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+
+.cd-pair { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+@container (min-width: 600px) { .cd-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.cd-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@container (min-width: 640px) { .cd-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+.cd-split { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+@container (min-width: 800px) { .cd-split { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.cd-facts { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+
+/* ── Metrics donut: legend moves under the chart in narrow cards ── */
+.cd-pie-row { display: flex; flex-direction: column; align-items: stretch; gap: 16px; }
+.cd-pie { width: 100%; min-width: 0; }
+.cd-pie-legend { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+@container (min-width: 380px) {
+  .cd-pie-row { flex-direction: row; align-items: center; }
+  .cd-pie { width: 50%; flex-shrink: 0; }
+}
+
+/* ── Ticket detail: main + aside; aside becomes a card grid when stacked ── */
+.cd-detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+.cd-detail-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.cd-detail-aside {
+  display: grid; gap: 16px; align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+@container (min-width: 880px) {
+  .cd-detail { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  .cd-detail-aside { display: flex; flex-direction: column; }
+}
+
+/* Segmented tabs scroll sideways instead of overflowing the page */
+.cd-tabs { display: flex; width: fit-content; max-width: 100%; overflow-x: auto; }
+.cd-tabs > * { flex-shrink: 0; white-space: nowrap; }
+
+/* ── Process wizard steps ── */
+.cd-steps { display: flex; align-items: center; gap: 8px; }
+.cd-step { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.cd-step-pill { padding: 6px 14px; white-space: nowrap; }
+.cd-step-line { flex: 1; min-width: 8px; height: 1px; background: #1e1e2e; }
+@container (max-width: 479.98px) {
+  .cd-steps { flex-wrap: wrap; gap: 6px; }
+  .cd-step { flex: none; }
+  .cd-step-pill { padding: 6px 10px; }
+  .cd-step-line { display: none; }
+}
+
+/* ── Footer: drop the separator dots once items wrap ── */
+.cd-footer { container-type: inline-size; }
+@container (max-width: 419.98px) { .cd-footer-dot { display: none; } }
+
+/* ── Login: side-by-side → stacked ── */
+.cd-login { min-height: 100vh; min-height: 100dvh; display: flex; background: #0a0a0f; position: relative; }
+.cd-login-hero {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 48px;
+  background: linear-gradient(135deg, #0d0d1a 0%, #111128 100%);
+  position: relative; overflow: hidden;
+}
+.cd-login-hero-body { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 420px; }
+.cd-login-title { font-size: 38px; }
+.cd-login-lead { max-width: 360px; }
+.cd-login-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 360px; }
+.cd-login-stat { padding: 16px; min-width: 0; }
+.cd-login-stat-value { font-size: 22px; line-height: 1.2; }
+.cd-login-panel {
+  width: clamp(360px, 36vw, 420px); flex-shrink: 0; display: flex; flex-direction: column;
+  padding: 48px 40px; background: #111118; border-left: 1px solid #1e1e2e;
+}
+.cd-login-panel-inner {
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+  width: 100%; max-width: 420px; margin-inline: auto;
+}
+/* Stacked: hero and form share one centered column so their edges line up */
+@media (max-width: 899.98px) {
+  .cd-login { flex-direction: column; }
+  .cd-login-hero { flex: none; padding: clamp(24px, 5vw, 40px) clamp(16px, 5vw, 24px); }
+  .cd-login-hero-inner { width: 100%; max-width: 560px; margin-inline: auto; }
+  .cd-login-hero-body { flex: none; max-width: none; margin: clamp(20px, 5vw, 32px) 0 clamp(16px, 4vw, 24px); }
+  .cd-login-title { font-size: clamp(26px, 7.5vw, 38px); }
+  .cd-login-lead { max-width: none; font-size: clamp(13px, 3.5vw, 14px) !important; }
+  .cd-login-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: none; margin-top: clamp(20px, 5vw, 32px) !important; }
+  .cd-login-panel { width: 100%; flex: 1; padding: clamp(24px, 6vw, 32px) clamp(16px, 5vw, 24px); border-left: none; border-top: 1px solid #1e1e2e; }
+  .cd-login-panel-inner { max-width: 560px; justify-content: flex-start; }
+}
+/* Phones: compact 2×2 stats */
+@media (max-width: 599.98px) {
+  .cd-login-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .cd-login-stat { padding: 12px 14px; }
+  .cd-login-stat-value { font-size: clamp(18px, 5.5vw, 22px); }
+}
+
+/* ── Touch ── */
+@media (pointer: coarse) {
+  .cd-tap { min-height: 40px; }
+  .cd-tap-icon {
+    min-height: 40px; min-width: 40px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  /* iOS zooms the page when focusing inputs under 16px; inline sizes need !important */
+  input, textarea, select { font-size: 16px !important; }
+  /* …but keep placeholder hints at their designed size so they fit the field */
+  input::placeholder, textarea::placeholder { font-size: 13px; }
+}
+input { text-overflow: ellipsis; }

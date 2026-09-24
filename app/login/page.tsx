@@ -24,9 +24,10 @@ export default function LoginPage() {
       login(res.data.access_token, res.data.agent);
     } catch (err: any) {
       const detail = err.response?.data?.detail;
-      if (typeof detail === "string") setError(detail);
+      if (!err.response) setError("Can't reach the server. Please try again in a moment.");
+      else if (typeof detail === "string") setError(detail);
       else if (Array.isArray(detail)) setError(detail.map((d: any) => d.msg).join(", "));
-      else setError("Invalid credentials");
+      else setError(`Sign-in failed (error ${err.response.status}). Please try again.`);
     } finally {
       setLoading(false);
     }
@@ -40,14 +41,10 @@ export default function LoginPage() {
   ];
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", background: "#0a0a0f", position: "relative" }}>
+    <div className="cd-login">
 
       {/* Left panel */}
-      <div style={{
-        flex: 1, display: "flex", flexDirection: "column", padding: "48px",
-        background: "linear-gradient(135deg, #0d0d1a 0%, #111128 100%)",
-        position: "relative", overflow: "hidden", minWidth: 0,
-      }}>
+      <div className="cd-login-hero">
         {/* Blobs */}
         <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none" }}>
           <div className="animate-blob" style={{ position: "absolute", borderRadius: "999px", opacity: 0.2, background: "radial-gradient(circle, #6366f1, transparent)", width: "400px", height: "400px", top: "-100px", left: "-100px" }} />
@@ -56,7 +53,7 @@ export default function LoginPage() {
         </div>
 
         {/* Content */}
-        <div style={{ position: "relative", zIndex: 10, display: "flex", flexDirection: "column", height: "100%" }}>
+        <div className="cd-login-hero-inner" style={{ position: "relative", zIndex: 10, display: "flex", flexDirection: "column", height: "100%" }}>
 
           {/* Logo */}
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }} className="animate-fade-up">
@@ -70,7 +67,7 @@ export default function LoginPage() {
           </div>
 
           {/* Hero */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", maxWidth: "420px" }}>
+          <div className="cd-login-hero-body">
             <div className="animate-fade-up stagger-1" style={{ marginBottom: "16px" }}>
               <span style={{
                 fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase",
@@ -81,7 +78,7 @@ export default function LoginPage() {
               </span>
             </div>
 
-            <h1 className="animate-fade-up stagger-2" style={{ fontSize: "38px", fontWeight: 700, color: "#fff", lineHeight: 1.15 }}>
+            <h1 className="animate-fade-up stagger-2 cd-login-title" style={{ fontWeight: 700, color: "#fff", lineHeight: 1.15 }}>
               Resolve tickets faster<br />
               <span style={{
                 background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
@@ -91,17 +88,17 @@ export default function LoginPage() {
               </span>
             </h1>
 
-            <p className="animate-fade-up stagger-3" style={{ marginTop: "16px", fontSize: "14px", lineHeight: 1.6, color: "#9ca3af", maxWidth: "360px" }}>
+            <p className="animate-fade-up stagger-3 cd-login-lead" style={{ marginTop: "16px", fontSize: "14px", lineHeight: 1.6, color: "#9ca3af" }}>
               Automatically classify, route, and respond to support tickets
               using a fine-tuned AI model trained on your domain.
             </p>
 
             {/* Stats grid */}
-            <div className="animate-fade-up stagger-4" style={{ marginTop: "32px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", maxWidth: "360px" }}>
+            <div className="animate-fade-up stagger-4 cd-login-stats" style={{ marginTop: "32px" }}>
               {stats.map(({ value, label }) => (
-                <div key={label} className="glass" style={{ borderRadius: "14px", padding: "16px" }}>
-                  <p style={{ fontSize: "22px", fontWeight: 700, color: "#fff" }}>{value}</p>
-                  <p style={{ fontSize: "11px", color: "#6b7280", marginTop: "2px" }}>{label}</p>
+                <div key={label} className="glass cd-login-stat" style={{ borderRadius: "14px" }}>
+                  <p className="cd-login-stat-value" style={{ fontWeight: 700, color: "#fff" }}>{value}</p>
+                  <p style={{ fontSize: "11px", lineHeight: 1.35, color: "#6b7280", marginTop: "2px" }}>{label}</p>
                 </div>
               ))}
             </div>
@@ -115,10 +112,8 @@ export default function LoginPage() {
       </div>
 
       {/* Right panel */}
-      <div style={{
-        width: "420px", flexShrink: 0, display: "flex", flexDirection: "column",
-        justifyContent: "center", padding: "48px 40px", background: "#111118", borderLeft: "1px solid #1e1e2e",
-      }}>
+      <div className="cd-login-panel">
+       <div className="cd-login-panel-inner">
         <div style={{ marginBottom: "32px" }}>
           <h2 style={{ fontSize: "24px", fontWeight: 700, color: "#ffffff", marginBottom: "6px" }}>Welcome back</h2>
           <p style={{ fontSize: "14px", color: "#6b7280" }}>Sign in to your support dashboard</p>
@@ -218,8 +213,9 @@ export default function LoginPage() {
           </p>
         </div>
         <div style={{ marginTop: "auto", paddingTop: "24px" }}>
-  <Footer />
-</div>
+          <Footer />
+        </div>
+       </div>
       </div>
     </div>
   );
